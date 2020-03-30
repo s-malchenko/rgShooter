@@ -13,5 +13,7 @@ UCLASS()
 class RGSHOOTER_API ArgShooterGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+    ArgShooterGameModeBase();
 };
