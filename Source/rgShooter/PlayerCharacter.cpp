@@ -1,6 +1,9 @@
 #include "PlayerCharacter.h"
 
 #include "Components/InputComponent.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
+#include "FpHUD.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -35,6 +38,17 @@ void APlayerCharacter::MoveRight(float val)
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	auto* fHud = Cast<AFpHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+
+	if (fHud)
+	{
+		// TODO use weapon spread instead of velocity
+		fHud->CrosshairSpread = GetVelocity().Size() / 100;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cannot cast HUD!"));
+	}
 }
 
 // Called to bind functionality to input
