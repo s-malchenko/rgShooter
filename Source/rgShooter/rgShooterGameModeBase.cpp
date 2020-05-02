@@ -13,6 +13,5 @@ ArgShooterGameModeBase::ArgShooterGameModeBase()
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/BP_FpCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<AHUD> HudClassFinder(TEXT("/Game/Blueprints/BP_FpHUD"));
-	HUDClass = HudClassFinder.Class;
+	HUDClass = AFpHUD::StaticClass();
 }
