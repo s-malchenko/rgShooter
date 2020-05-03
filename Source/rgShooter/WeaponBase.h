@@ -12,7 +12,7 @@ class RGSHOOTER_API AWeaponBase : public AActor
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USkeletalMeshComponent* Mesh;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = Name)
+	UPROPERTY(EditAnywhere, Category = Name)
 	FName SocketName;
 	
 public:	
@@ -30,4 +30,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void Equip();
+	void Unequip();
 };

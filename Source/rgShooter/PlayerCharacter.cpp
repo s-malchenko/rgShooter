@@ -6,12 +6,16 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "UObject/ConstructorHelpers.h"
+
 #include "FpHUD.h"
 
+TSubclassOf<AWeaponBase> pistolClass;
+TSubclassOf<AWeaponBase> rifleClass;
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
- 	// Set this character to call Tick() every frame. You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Set size for collision capsule
@@ -27,6 +31,12 @@ APlayerCharacter::APlayerCharacter()
 	FpMesh->SetupAttachment(FpCamera);
 	FpMesh->bCastDynamicShadow = false;
 	FpMesh->CastShadow = false;
+
+	weapons.AddDefaulted(WeaponSlotCount);
+	static ConstructorHelpers::FClassFinder<AWeaponBase>pistolFinder(TEXT("/Game/Blueprints/Weapons/BP_Pistol"));
+	static ConstructorHelpers::FClassFinder<AWeaponBase>rifleFinder(TEXT("/Game/Blueprints/Weapons/BP_Rifle"));
+	pistolClass = pistolFinder.Class;
+	rifleClass = rifleFinder.Class;
 }
 
 // Called when the game starts or when spawned
@@ -40,7 +50,8 @@ void APlayerCharacter::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("Cannot find HUD!"));
 	}
 
-	weapons.AddDefaulted(WeaponSlotCount);
+	weapons[0] = GetWorld()->SpawnActor<AWeaponBase>(pistolClass);
+	weapons[1] = GetWorld()->SpawnActor<AWeaponBase>(rifleClass);
 }
 
 void APlayerCharacter::MoveForward(float Val)
@@ -96,13 +107,20 @@ void APlayerCharacter::EquipWeapon(uint16 slotIndex)
 
 	UE_LOG(LogTemp, Warning, TEXT("Trying to equip weapon slot %d"), slotIndex);
 
+	if (currentWeapon)
+	{
+		currentWeapon->Unequip();
+		currentWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	}
+
 	currentWeaponSlot = slotIndex;
 	currentWeapon = weapons[slotIndex];
 
 	if (currentWeapon)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Weapon slot %d equipped"), slotIndex);
-		currentWeapon->GetMesh()->SetupAttachment(FpMesh, currentWeapon->GetSocketName());
+		currentWeapon->AttachToComponent(FpMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, currentWeapon->GetSocketName());
+		currentWeapon->Equip();
 	}
 }
 

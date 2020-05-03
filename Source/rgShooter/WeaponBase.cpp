@@ -6,6 +6,9 @@
 AWeaponBase::AWeaponBase()
 {
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	SetRootComponent(Mesh);
+	Mesh->bCastDynamicShadow = false;
+	Mesh->CastShadow = false;
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -29,5 +32,15 @@ void AWeaponBase::BeginPlay()
 void AWeaponBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AWeaponBase::Equip()
+{
+	SetActorHiddenInGame(false);
+}
+
+void AWeaponBase::Unequip()
+{
+	SetActorHiddenInGame(true);
 }
 
