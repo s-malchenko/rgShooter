@@ -39,6 +39,8 @@ void APlayerCharacter::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Cannot find HUD!"));
 	}
+
+	weapons.AddDefaulted(WeaponSlotCount);
 }
 
 void APlayerCharacter::MoveForward(float Val)
@@ -54,6 +56,53 @@ void APlayerCharacter::MoveRight(float val)
 	if (val != 0)
 	{
 		AddMovementInput(GetActorRightVector(), val);
+	}
+}
+
+void APlayerCharacter::EquipNextWeapon()
+{
+	auto slotToEquip = currentWeaponSlot;
+
+	if (++slotToEquip >= weapons.Num())
+	{
+		slotToEquip = 0;
+	}
+
+	EquipWeapon(slotToEquip);
+}
+
+void APlayerCharacter::EquipPrevWeapon()
+{
+	auto slotToEquip = currentWeaponSlot;
+
+	if (slotToEquip > 0)
+	{
+		--slotToEquip;
+	}
+	else
+	{
+		slotToEquip = weapons.Num() - 1;
+	}
+
+	EquipWeapon(slotToEquip);
+}
+
+void APlayerCharacter::EquipWeapon(uint16 slotIndex)
+{
+	if (slotIndex + 1 > weapons.Num())
+	{
+		slotIndex = weapons.Num() - 1;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Trying to equip weapon slot %d"), slotIndex);
+
+	currentWeaponSlot = slotIndex;
+	currentWeapon = weapons[slotIndex];
+
+	if (currentWeapon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Weapon slot %d equipped"), slotIndex);
+		currentWeapon->GetMesh()->SetupAttachment(FpMesh, currentWeapon->GetSocketName());
 	}
 }
 
@@ -86,5 +135,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	// Bind mouse look
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+	// Bind weapon changing
+	PlayerInputComponent->BindAction("NextWeapon", IE_Pressed, this, &APlayerCharacter::EquipNextWeapon);
+	PlayerInputComponent->BindAction("PrevWeapon", IE_Pressed, this, &APlayerCharacter::EquipPrevWeapon);
 }
 

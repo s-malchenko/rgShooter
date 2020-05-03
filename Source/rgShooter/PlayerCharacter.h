@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "FpHUD.h"
 #include "GameFramework/Character.h"
+#include "WeaponBase.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -20,6 +21,13 @@ class RGSHOOTER_API APlayerCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FpCamera;
 
+	UPROPERTY(VisibleAnywhere)
+	uint16 WeaponSlotCount = 2;
+
+	TArray<AWeaponBase*> weapons;
+	AWeaponBase* currentWeapon;
+	uint16 currentWeaponSlot;
+
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
@@ -33,6 +41,10 @@ protected:
 
 	// Handles strafing movement, left and right
 	void MoveRight(float val);
+
+	void EquipNextWeapon();
+	void EquipPrevWeapon();
+	void EquipWeapon(uint16 slotIndex);
 
 public:	
 	// Called every frame
