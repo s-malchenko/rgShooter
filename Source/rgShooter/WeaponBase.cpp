@@ -1,6 +1,40 @@
 #include "WeaponBase.h"
 
+#include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "DrawDebugHelpers.h"
+
+void AWeaponBase::DebugFire(bool secondary)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Debug Pew"));
+	auto color = secondary ? FColor::Magenta : FColor::Red;
+
+	DrawDebugSphere(
+		GetWorld(),
+		GetMuzzleAbsoluteLocation(),
+		10,
+		8,
+		color,
+		false,
+		0.03, // life time in sec
+		0,
+		5
+	);
+
+	// TODO this line shows the direction of weapon but not the bullet path
+	auto lineStart = GetMuzzleAbsoluteLocation();
+	auto lineEnd = lineStart - GetActorForwardVector() * 500;
+	DrawDebugLine(
+		GetWorld(),
+		lineStart,
+		lineEnd,
+		color,
+		false,
+		5, // life time in sec
+		0,
+		2
+	);
+}
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -9,6 +43,8 @@ AWeaponBase::AWeaponBase()
 	SetRootComponent(Mesh);
 	Mesh->bCastDynamicShadow = false;
 	Mesh->CastShadow = false;
+
+	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -42,5 +78,15 @@ void AWeaponBase::Equip()
 void AWeaponBase::Unequip()
 {
 	SetActorHiddenInGame(true);
+}
+
+void AWeaponBase::TryFire(bool secondary)
+{
+	DebugFire(secondary);
+}
+
+FVector AWeaponBase::GetMuzzleAbsoluteLocation()
+{
+	return GetActorLocation() + GetActorRotation().RotateVector(MuzzleLocation->GetRelativeLocation());
 }
 

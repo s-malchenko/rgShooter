@@ -46,6 +46,10 @@ protected:
 	void EquipPrevWeapon();
 	void EquipWeapon(uint16 slotIndex);
 
+	// Handles fire of current weapon, if equipped
+	void PrimaryFire();
+	void SecondaryFire();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

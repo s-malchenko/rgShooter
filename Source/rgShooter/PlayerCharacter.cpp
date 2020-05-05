@@ -105,8 +105,6 @@ void APlayerCharacter::EquipWeapon(uint16 slotIndex)
 		slotIndex = weapons.Num() - 1;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Trying to equip weapon slot %d"), slotIndex);
-
 	if (currentWeapon)
 	{
 		currentWeapon->Unequip();
@@ -118,9 +116,24 @@ void APlayerCharacter::EquipWeapon(uint16 slotIndex)
 
 	if (currentWeapon)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Weapon slot %d equipped"), slotIndex);
 		currentWeapon->AttachToComponent(FpMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, currentWeapon->GetSocketName());
 		currentWeapon->Equip();
+	}
+}
+
+void APlayerCharacter::PrimaryFire()
+{
+	if (currentWeapon)
+	{
+		currentWeapon->TryFire();
+	}
+}
+
+void APlayerCharacter::SecondaryFire()
+{
+	if (currentWeapon)
+	{
+		currentWeapon->TryFire(true);
 	}
 }
 
@@ -157,5 +170,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	// Bind weapon changing
 	PlayerInputComponent->BindAction("NextWeapon", IE_Pressed, this, &APlayerCharacter::EquipNextWeapon);
 	PlayerInputComponent->BindAction("PrevWeapon", IE_Pressed, this, &APlayerCharacter::EquipPrevWeapon);
+
+	// Bind fire actions
+	PlayerInputComponent->BindAction("PrimaryFire", IE_Pressed, this, &APlayerCharacter::PrimaryFire);
+	PlayerInputComponent->BindAction("SecondaryFire", IE_Pressed, this, &APlayerCharacter::SecondaryFire);
 }
 
